@@ -4,6 +4,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\MockSlackAPI;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BurritoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,8 @@ Route::resource( 'event', EventController::class )
         'show',
         'edit'
     ] );
+
+Route::post('/burrito', [BurritoController::class, 'slackChallenge']);
 
 Route::get( '/slack', function() {
     echo 'Hello';

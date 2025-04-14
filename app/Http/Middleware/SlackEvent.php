@@ -16,16 +16,16 @@ class SlackEvent {
     public function handle( Request $request, Closure $next ) {
         // Slack verification token is not passed in request
         if ( empty( $request->all()[ 'token' ] ) ) {
-            return redirect( '/' );
+            return response()->json(['error' => 'Missing verification token'], 401);
         }
 
         // Incorrect Slack verification token is passed in request
         if ( $request->all()[ 'token' ] !== env( 'VERIFICATION_TOKEN' ) ) {
-            return redirect( '/' );
+            return response()->json(['error' => 'Invalid verification token'], 401);
         }
 
         if ( $request->json()->has( 'challenge' ) ) {
-            return response( [ 'challenge' => $request->json()->get( 'challenge' ) ], 200 );
+            return response()->json(['challenge' => $request->json()->get('challenge')], 200);
         }
 
         return $next( $request );

@@ -8,6 +8,7 @@ use App\Http\Requests\EventPostRequest;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class EventController extends Controller {
@@ -25,6 +26,7 @@ class EventController extends Controller {
      * @return Response
      */
     public function index() {
+        Log::info('GET /api/event accessed');
         return response( 'GET /api/event' );
     }
 
@@ -43,26 +45,36 @@ class EventController extends Controller {
      * @param EventPostRequest $request
      * @return Response
      */
-    public function store( EventPostRequest $request ) {
-        $validated = $request->validated();
+    public function store(EventPostRequest $request) {
+        Log::info('POST /api/event received', [
+            'request_data' => $request->all(),
+            'ip' => $request->ip()
+        ]);
 
-        $event = new Event();
+        try {
+            $validated = $request->validated();
+            
+            $event = new Event();
+            $event->type = $validated['type'] ?? 'message';
+            $event->user = $validated['event']['user'] ?? null;
+            $event->channel = $validated['event']['channel'] ?? null;
+            $event->text = $validated['event']['text'] ?? null;
+            $event->save();
 
-        if ( !empty( $validated[ 'event' ] ) ) {
-            $event->type = $validated[ 'event' ][ 'type' ];
-            $event->user = $validated[ 'event' ][ 'user' ]; // could be user_id but also user element could be an array
-            $event->channel = $validated[ 'event' ][ 'channel' ];
-            $event->text = $validated[ 'event' ][ 'text' ];
-        } else {
-            $event->type = 'slash_command';
-            $event->user = $validated[ 'user_id' ];
-            $event->channel = $validated[ 'channel_id' ];
-            $event->text = $validated[ 'text' ];
+            Log::info('Event saved successfully', ['event_id' => $event->id]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Event received and stored',
+                'event_id' => $event->id
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error processing event', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Internal Server Error'], 500);
         }
-
-        $event->save();
-
-        return response( 'POST /api/event' );
     }
 
     /**
