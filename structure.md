@@ -1,146 +1,146 @@
-# HeyBurrito 项目结构文档
+# HeyBurrito Project Structure Documentation
 
-## 项目概述
-HeyBurrito 是一个开源的 Slack Bot 项目，用于替代 HeyTaco 功能。
+## Project Overview
+HeyBurrito is an open-source Slack Bot project designed to replace HeyTaco functionality.
 
-## 技术栈
+## Tech Stack
 - PHP 8.1+
-- Laravel 框架
-- MySQL 数据库
+- Laravel Framework
+- MySQL Database
 - Slack API
 
-## 目录结构
+## Directory Structure
 ```
 HeyBurrito/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
-│   │   │   ├── BurritoController.php    # 处理 Slack 事件
-│   │   │   ├── EventController.php      # 处理事件存储
-│   │   │   ├── UserController.php       # 用户管理
-│   │   │   └── MockSlackAPI.php         # Slack API 模拟
+│   │   │   ├── BurritoController.php    # Handles Slack events
+│   │   │   ├── EventController.php      # Manages event storage
+│   │   │   ├── UserController.php       # User management
+│   │   │   └── MockSlackAPI.php         # Slack API simulation
 │   │   ├── Middleware/
-│   │   │   ├── SlackEvent.php           # Slack 事件验证
-│   │   │   └── TokenAuth.php            # 令牌验证
+│   │   │   ├── SlackEvent.php           # Slack event validation
+│   │   │   └── TokenAuth.php            # Token authentication
 │   │   └── Requests/
-│   │       └── EventPostRequest.php     # 事件请求验证
+│   │       └── EventPostRequest.php     # Event request validation
 │   ├── Models/
-│   │   ├── Event.php                    # 事件模型
-│   │   ├── User.php                     # 用户模型
-│   │   └── Burrito.php                  # Burrito 模型
+│   │   ├── Event.php                    # Event model
+│   │   ├── User.php                     # User model
+│   │   └── Burrito.php                  # Burrito model
 │   └── Slack/
-│       └── SlackUserData.php            # Slack 用户数据处理
+│       └── SlackUserData.php            # Slack user data processing
 ├── config/
 ├── database/
-│   └── migrations/                      # 数据库迁移文件
+│   └── migrations/                      # Database migration files
 ├── routes/
-│   └── api.php                          # API 路由定义
-└── tests/                               # 测试文件
+│   └── api.php                          # API route definitions
+└── tests/                               # Test files
 ```
 
-## API 规范
+## API Specifications
 
 ### 1. Event API
 ```
 POST /api/event
-用途：处理 Slack 事件
-请求体：
+Purpose: Handle Slack events
+Request Body:
 {
-    "token": "验证令牌",
-    "team_id": "团队ID",
+    "token": "verification_token",
+    "team_id": "team_id",
     "event": {
         "type": "app_mention",
-        "user": "用户ID",
-        "text": "消息内容",
-        "channel": "频道ID"
+        "user": "user_id",
+        "text": "message_content",
+        "channel": "channel_id"
     },
     "type": "event_callback"
 }
-响应：
-- 成功：200 OK
-- 失败：相应的错误状态码
+Response:
+- Success: 200 OK
+- Failure: Appropriate error status code
 ```
 
 ### 2. User API
 ```
 GET /api/user
-用途：获取用户列表
-需要认证：是
+Purpose: Get user list
+Authentication: Required
 
 POST /api/user
-用途：创建新用户
-需要认证：是
-请求体：
+Purpose: Create new user
+Authentication: Required
+Request Body:
 {
-    "username": "用户名"
+    "username": "username"
 }
 
 PATCH /api/user/{username}
-用途：更新用户信息
-需要认证：是
+Purpose: Update user information
+Authentication: Required
 
 DELETE /api/user/{userId}
-用途：删除用户
-需要认证：是
+Purpose: Delete user
+Authentication: Required
 ```
 
 ### 3. Slack Mock API
 ```
 GET /api/slack
-用途：测试端点
+Purpose: Test endpoint
 
 GET /api/slack/event/{eventType}
-用途：模拟 Slack 事件
-参数：
+Purpose: Simulate Slack events
+Parameters:
 - eventType: challenge/app_mention/message/slash_command
 
 GET /api/slack/users.list
-用途：模拟 Slack 用户列表 API
+Purpose: Simulate Slack users list API
 ```
 
-## 数据库结构
+## Database Structure
 
-### events 表
-- id: 主键
-- type: 事件类型
-- user: 用户ID
-- channel: 频道ID
-- text: 消息内容
-- created_at: 创建时间
-- updated_at: 更新时间
+### events table
+- id: Primary key
+- type: Event type
+- user: User ID
+- channel: Channel ID
+- text: Message content
+- created_at: Creation timestamp
+- updated_at: Update timestamp
 
-### users 表
-- id: 主键
-- user_id: Slack 用户ID
-- name: 用户名
-- created_at: 创建时间
-- updated_at: 更新时间
+### users table
+- id: Primary key
+- user_id: Slack user ID
+- name: Username
+- created_at: Creation timestamp
+- updated_at: Update timestamp
 
-### burrito 表
-- id: 主键
-- burrito_giver: 赠送者
-- burrito_receiver: 接收者
-- message_sent_to_giver: 是否发送消息给赠送者
-- message_sent_to_receiver: 是否发送消息给接收者
-- created_at: 创建时间
-- updated_at: 更新时间
+### burrito table
+- id: Primary key
+- burrito_giver: Giver ID
+- burrito_receiver: Receiver ID
+- message_sent_to_giver: Message sent to giver flag
+- message_sent_to_receiver: Message sent to receiver flag
+- created_at: Creation timestamp
+- updated_at: Update timestamp
 
-## 环境要求
+## Environment Requirements
 - PHP 8.1+
 - MySQL 5.7+
 - Composer
-- SSL 证书（用于 Slack API）
-- Slack App 配置
+- SSL Certificate (for Slack API)
+- Slack App Configuration
 
-## 配置说明
-1. 复制 .env.example 为 .env
-2. 配置数据库连接
-3. 设置 Slack API 凭证
-4. 配置日志级别
+## Configuration Instructions
+1. Copy .env.example to .env
+2. Configure database connection
+3. Set Slack API credentials
+4. Configure log level
 
-## 部署说明
-1. 安装依赖：`composer install`
-2. 生成密钥：`php artisan key:generate`
-3. 运行迁移：`php artisan migrate`
-4. 启动服务：`php artisan serve`
-5. 配置 Slack App 事件订阅 
+## Deployment Instructions
+1. Install dependencies: `composer install`
+2. Generate key: `php artisan key:generate`
+3. Run migrations: `php artisan migrate`
+4. Start server: `php artisan serve`
+5. Configure Slack App event subscriptions 
